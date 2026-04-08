@@ -17,13 +17,13 @@ Internet
 │  (ALB + HTTPS-ready listener)   │
 └───────────────┬─────────────────┘
                 │  (port 80, target_type = ip)
-    ▼
+                ▼
 ┌─────────────────────────────────┐
 │  ECS Fargate Service            │  ← private subnets
 │  (Laravel container, awsvpc)    │
 └───────────────┬─────────────────┘
                 │  (port 3306)
-    ▼
+                ▼
 ┌─────────────────────────────────┐
 │  RDS MySQL 8.0                  │  ← private subnets
 └─────────────────────────────────┘
@@ -38,8 +38,10 @@ Internet
 | `alb` | `modules/alb` | Application Load Balancer, target group, listener |
 | `ecr` | `modules/ecr` | ECR repository with image scanning |
 | `iam` | `modules/iam` | ECS execution role + task role with managed policies |
-| `ecs` | `modules/ecs` | ECS cluster, Fargate task definition, service |
+| `ecs` | `modules/ecs` | ECS cluster, Fargate task definition, service, CW log group |
 | `rds` | `modules/rds` | RDS MySQL instance and subnet group |
+| `monitoring` | `modules/monitoring` | CloudWatch alarms (ECS CPU utilisation) |
+| `secrets` | `modules/secrets` | Secrets Manager secret for RDS credentials |
 
 ### Environments
 
@@ -74,9 +76,16 @@ backend "s3" {
 
 ---
 
-## Deploy
+## Deploy (Local)
 
-### 1. Supply the database password securely
+### 1. Create your local var file
+
+```bash
+cp env/dev/terraform.tfvars.example env/dev/terraform.tfvars
+# Edit terraform.tfvars with your image URL, db_name, and db_user
+```
+
+### 2. Supply the database password securely
 
 Never commit the password to source control. Pass it as an environment variable:
 
@@ -84,17 +93,16 @@ Never commit the password to source control. Pass it as an environment variable:
 export TF_VAR_db_password="your-secure-password"
 ```
 
-### 2. Initialise and apply
+### 3. Initialise and apply
 
 ```bash
 cd env/dev
-
 terraform init
 terraform plan
 terraform apply
 ```
 
-### Variables (`env/dev/terraform.tfvars`)
+### Variables
 
 | Variable | Description | Default |
 |---|---|---|
@@ -103,6 +111,34 @@ terraform apply
 | `db_name` | RDS database name | — |
 | `db_user` | RDS master username | — |
 | `db_password` | RDS master password *(sensitive)* | — |
+
+---
+
+## CI/CD (GitHub Actions)
+
+Two workflows run automatically on push/PR to `main`:
+
+### `.github/workflows/terraform.yml` — Terraform
+
+| Trigger | Steps |
+|---|---|
+| Pull Request → `main` | `init` → `validate` → `plan` |
+| Push → `main` | `init` → `validate` → `plan` → `apply` |
+
+### `.github/workflows/deploy.yml` — Docker Build & ECR Push
+
+Builds the Laravel Docker image, tags it with the git SHA, and pushes to ECR
+on every push to `main`.
+
+### Required GitHub Secrets
+
+Add these under **Settings → Secrets and variables → Actions**:
+
+| Secret | Description |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | IAM access key with ECR/ECS/RDS permissions |
+| `AWS_SECRET_ACCESS_KEY` | Corresponding secret key |
+| `TF_VAR_DB_PASSWORD` | RDS master password (used by Terraform workflow) |
 
 ---
 
@@ -117,6 +153,7 @@ terraform apply
   CloudWatch Logs.
 - `db_password` is marked `sensitive = true` in Terraform and must be
   supplied via `TF_VAR_db_password` — never stored in `terraform.tfvars`.
+- `*.tfvars` is git-ignored. Use `terraform.tfvars.example` as a template.
 
 ---
 
