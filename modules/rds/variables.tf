@@ -1,3 +1,8 @@
-variable "private_subnets" {}
-variable "vpc_id" {}
-variable "db_sg" {}
+variable "subnet_ids" {}
+variable "security_group" {}
+variable "db_name" {}
+variable "username" {}
+
+variable "password" {
+  sensitive = true
+}

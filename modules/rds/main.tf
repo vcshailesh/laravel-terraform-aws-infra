@@ -1,14 +1,17 @@
 resource "aws_db_subnet_group" "this" {
-  subnet_ids = var.private_subnets
+  name       = "laravel-db-subnet-group"
+  subnet_ids = var.subnet_ids
 }
 
 resource "aws_db_instance" "this" {
-  engine               = "mysql"
-  instance_class       = "db.t3.micro"
-  allocated_storage    = 20
-  username             = aws_secretsmanager_secret_version.db.secret_string.username
-  password             = aws_secretsmanager_secret_version.db.secret_string.password
-  db_subnet_group_name = aws_db_subnet_group.this.name
-  vpc_security_group_ids = [var.db_sg]
-  skip_final_snapshot  = true
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 20
+  db_name                = var.db_name
+  username               = var.username
+  password               = var.password
+  db_subnet_group_name   = aws_db_subnet_group.this.name
+  vpc_security_group_ids = [var.security_group]
+  skip_final_snapshot    = true
 }

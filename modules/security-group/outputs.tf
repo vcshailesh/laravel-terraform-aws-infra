@@ -6,6 +6,6 @@ output "app_sg" {
   value = aws_security_group.app.id
 }
 
-output "db_sg" {
+output "rds_sg" {
   value = aws_security_group.db.id
 }
