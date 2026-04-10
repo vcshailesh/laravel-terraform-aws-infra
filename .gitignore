@@ -1,13 +1,30 @@
-# Terraform state
+# Terraform working directories
 .terraform/
+
+# State files (managed remotely via S3)
 *.tfstate
 *.tfstate.backup
-.terraform.lock.hcl
 
 # Sensitive var files — use terraform.tfvars.example as a template
 *.tfvars
+!*.tfvars.example
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Override files (local dev overrides)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
 # macOS / IDE
 .DS_Store
 .idea/
 .vscode/
+*.swp
+*.swo
+
+# Plan output (binary)
+*.tfplan

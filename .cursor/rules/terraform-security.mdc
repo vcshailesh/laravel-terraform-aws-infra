@@ -1,0 +1,51 @@
+---
+description: Security and production-readiness standards for Terraform AWS resources
+globs: "**/*.tf"
+alwaysApply: false
+---
+
+# Security & Production Readiness
+
+## Encryption
+
+- RDS: `storage_encrypted = true` always.
+- S3 buckets: enable `server_side_encryption_configuration`.
+- EBS volumes: encrypted by default.
+
+## Network Isolation
+
+- RDS: `publicly_accessible = false`, placed in private subnets.
+- ECS tasks: private subnets only, traffic routed through ALB.
+- NAT Gateway required for private subnet outbound (ECR pulls, external APIs).
+
+## IAM
+
+- Use specific managed policy ARNs — never `*` actions.
+- Separate execution role (ECR pull + logs) from task role (app permissions).
+- Tag all roles with Project/Environment.
+
+## Database Safety
+
+```hcl
+# BAD — data loss risk
+skip_final_snapshot = true
+
+# GOOD — production safe
+skip_final_snapshot       = false
+final_snapshot_identifier = "${var.project}-${var.environment}-final"
+deletion_protection       = true
+backup_retention_period   = 7
+```
+
+## Secrets
+
+- Never hardcode credentials in `.tf` files.
+- Use `sensitive = true` on password variables.
+- Store secrets in AWS Secrets Manager, reference via `aws_secretsmanager_secret_version`.
+- Supply passwords via `TF_VAR_*` environment variables.
+
+## ALB
+
+- Enable HTTPS (443) listener with ACM certificate in production.
+- Redirect HTTP → HTTPS.
+- Enable access logs to S3 for audit trail.

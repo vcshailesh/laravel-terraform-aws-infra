@@ -1,0 +1,65 @@
+---
+description: Terraform module design conventions for this AWS Laravel infrastructure project
+globs: modules/**/*.tf
+alwaysApply: false
+---
+
+# Terraform Module Standards
+
+## File Layout
+
+Every module directory must contain:
+- `main.tf` — primary resources
+- `variables.tf` — all inputs with `type`, `description`, and `default` where appropriate
+- `outputs.tf` — all outputs with `description`
+
+Never declare variables inline in resource files.
+
+## Variable Declarations
+
+```hcl
+# BAD
+variable "vpc_id" {}
+
+# GOOD
+variable "vpc_id" {
+  description = "ID of the VPC to deploy into"
+  type        = string
+}
+```
+
+## Tagging
+
+Accept `project` and `environment` variables. Tag every taggable resource:
+
+```hcl
+locals {
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}
+
+resource "aws_vpc" "this" {
+  cidr_block = var.vpc_cidr
+  tags       = merge(local.common_tags, { Name = "${var.project}-${var.environment}-vpc" })
+}
+```
+
+## Naming
+
+- Use `this` or `main` as the logical resource name when a module manages a single instance.
+- AWS resource names: `${var.project}-${var.environment}-<component>`.
+- Never hardcode region, AZs, or account IDs — accept them as variables.
+
+## Outputs
+
+Always output IDs, ARNs, and DNS names that downstream modules or root modules need:
+
+```hcl
+output "vpc_id" {
+  description = "The VPC ID"
+  value       = aws_vpc.this.id
+}
+```

@@ -1,12 +1,18 @@
-variable "db_username" {}
-
-variable "db_password" {
-  sensitive = true
+locals {
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
 }
 
 resource "aws_secretsmanager_secret" "db" {
-  name                    = "laravel/rds-credentials"
-  recovery_window_in_days = 7
+  name                    = "${var.project}/${var.environment}/rds-credentials"
+  recovery_window_in_days = var.recovery_window_in_days
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-${var.environment}-rds-credentials"
+  })
 }
 
 resource "aws_secretsmanager_secret_version" "db" {

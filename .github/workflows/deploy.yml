@@ -10,6 +10,7 @@ env:
 
 jobs:
   deploy:
+    name: Build & Push Image
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +38,11 @@ jobs:
                       $REGISTRY/$ECR_REPOSITORY:latest
           docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster laravel-dev \
+            --service laravel-dev-service \
+            --force-new-deployment \
+            --region $AWS_REGION
