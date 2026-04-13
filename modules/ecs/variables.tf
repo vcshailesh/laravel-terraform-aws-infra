@@ -106,3 +106,46 @@ variable "enable_container_insights" {
   type        = bool
   default     = true
 }
+
+# ── Database configuration ──────────────────────
+
+variable "db_host" {
+  description = "RDS instance hostname"
+  type        = string
+}
+
+variable "db_port" {
+  description = "RDS instance port"
+  type        = number
+  default     = 3306
+}
+
+variable "db_name" {
+  description = "Name of the database"
+  type        = string
+}
+
+variable "db_secret_arn" {
+  description = "ARN of the Secrets Manager secret containing DB credentials (JSON with 'username' and 'password' keys)"
+  type        = string
+}
+
+# ── Application configuration ───────────────────
+
+variable "app_key" {
+  description = "Laravel APP_KEY for encryption"
+  type        = string
+  sensitive   = true
+}
+
+variable "app_url" {
+  description = "Public URL of the application (ALB DNS or custom domain)"
+  type        = string
+  default     = ""
+}
+
+variable "enable_migrations" {
+  description = "Run database migrations on container startup"
+  type        = bool
+  default     = true
+}

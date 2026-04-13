@@ -30,6 +30,24 @@ resource "aws_ecs_task_definition" "this" {
 
       environment = [
         { name = "APP_ENV", value = var.environment },
+        { name = "APP_KEY", value = var.app_key },
+        { name = "APP_URL", value = var.app_url },
+        { name = "DB_CONNECTION", value = "mysql" },
+        { name = "DB_HOST", value = var.db_host },
+        { name = "DB_PORT", value = tostring(var.db_port) },
+        { name = "DB_DATABASE", value = var.db_name },
+        { name = "RUN_MIGRATIONS", value = var.enable_migrations ? "true" : "false" },
+      ]
+
+      secrets = [
+        {
+          name      = "DB_USERNAME"
+          valueFrom = "${var.db_secret_arn}:username::"
+        },
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = "${var.db_secret_arn}:password::"
+        },
       ]
 
       logConfiguration = {

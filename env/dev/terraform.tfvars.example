@@ -7,6 +7,8 @@ image_url   = "ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/laravel-app:latest"
 db_name     = "laravel"
 db_user     = "admin"
 
-# db_password is intentionally omitted.
-# Supply it at plan/apply time:
+# Sensitive values — supply via TF_VAR_* or uncomment below:
 #   export TF_VAR_db_password="your-secure-password"
+#   export TF_VAR_app_key="base64:YOUR_LARAVEL_APP_KEY"
+# db_password = ""
+# app_key     = ""

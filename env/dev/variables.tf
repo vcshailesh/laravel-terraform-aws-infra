@@ -30,3 +30,9 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "app_key" {
+  description = "Laravel APP_KEY — supply via TF_VAR_app_key (e.g. base64:...)"
+  type        = string
+  sensitive   = true
+}

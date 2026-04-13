@@ -46,8 +46,9 @@ module "ecr" {
 module "iam" {
   source = "../../modules/iam"
 
-  project     = local.project
-  environment = local.environment
+  project      = local.project
+  environment  = local.environment
+  secrets_arns = [module.secrets.secret_arn]
 }
 
 # ───────────────────────────────────────────────
@@ -133,6 +134,17 @@ module "ecs" {
   min_capacity       = 1
   max_capacity       = 4
   log_retention_days = 7
+
+  # Database configuration
+  db_host       = module.rds.address
+  db_port       = module.rds.port
+  db_name       = var.db_name
+  db_secret_arn = module.secrets.secret_arn
+
+  # Application configuration
+  app_key           = var.app_key
+  app_url           = "http://${module.alb.alb_dns_name}"
+  enable_migrations = true
 }
 
 # ───────────────────────────────────────────────
