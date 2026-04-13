@@ -74,13 +74,13 @@ variable "memory" {
 variable "desired_count" {
   description = "Desired number of running tasks"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "min_capacity" {
   description = "Minimum number of tasks for autoscaling"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "max_capacity" {

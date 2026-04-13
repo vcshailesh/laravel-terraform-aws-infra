@@ -36,6 +36,7 @@ module "ecr" {
   project         = local.project
   environment     = local.environment
   repository_name = "laravel-app"
+  force_delete    = true
 }
 
 # ───────────────────────────────────────────────
@@ -81,12 +82,13 @@ module "rds" {
   username       = var.db_user
   password       = var.db_password
 
-  instance_class      = "db.t3.micro"
-  allocated_storage   = 20
-  storage_encrypted   = true
-  multi_az            = false
-  deletion_protection = false
-  skip_final_snapshot = true
+  instance_class          = "db.t3.micro"
+  allocated_storage       = 20
+  storage_encrypted       = true
+  multi_az                = false
+  deletion_protection     = false
+  skip_final_snapshot     = true
+  backup_retention_period = 1
 }
 
 # ───────────────────────────────────────────────
@@ -96,10 +98,11 @@ module "rds" {
 module "secrets" {
   source = "../../modules/secrets"
 
-  project     = local.project
-  environment = local.environment
-  db_username = var.db_user
-  db_password = var.db_password
+  project                 = local.project
+  environment             = local.environment
+  db_username             = var.db_user
+  db_password             = var.db_password
+  recovery_window_in_days = 0
 }
 
 # ───────────────────────────────────────────────

@@ -24,3 +24,9 @@ variable "max_image_count" {
   type        = number
   default     = 30
 }
+
+variable "force_delete" {
+  description = "If true, deleting the repository will force-delete all contained images"
+  type        = bool
+  default     = false
+}
