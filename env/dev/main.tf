@@ -129,7 +129,7 @@ module "ecs" {
 
   cpu                = 256
   memory             = 512
-  desired_count      = 2
+  desired_count      = 1
   min_capacity       = 1
   max_capacity       = 4
   log_retention_days = 7

@@ -48,16 +48,16 @@ WORKDIR /var/www/html
 
 # ── Dependencies (cached layer) ──────────────────
 FROM base AS deps
-COPY laravel-app/composer.json laravel-app/composer.lock ./
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # ── Final image ──────────────────────────────────
 FROM base AS production
 
 COPY --from=deps /var/www/html/vendor /var/www/html/vendor
-COPY laravel-app/ /var/www/html
+COPY . /var/www/html
 
-RUN composer dump-autoload --optimize --no-dev \
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh

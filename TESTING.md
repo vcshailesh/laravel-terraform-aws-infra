@@ -48,6 +48,8 @@ out of the box — our ALB health check points to it.
 This validates the Dockerfile, Nginx config, and PHP setup before touching AWS.
 
 ```bash
+cd laravel-app
+
 # Build and start the stack
 docker compose up --build -d
 
@@ -67,6 +69,8 @@ docker compose logs -f app
 
 # Tear down when done
 docker compose down -v
+
+cd ..
 ```
 
 **If this works**, the Docker image is production-ready and you can proceed to
@@ -165,7 +169,7 @@ aws ecr get-login-password --region $REGION | \
   docker login --username AWS --password-stdin $ECR_URL
 
 # Build
-docker build -t $ECR_URL:latest .
+docker build -t $ECR_URL:latest laravel-app/
 
 # Push
 docker push $ECR_URL:latest

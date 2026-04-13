@@ -55,7 +55,7 @@ echo ""
 
 # ── 4. Build the image ───────────────────────────
 echo "==> Building image: ${FULL_TAG}"
-docker build -t "${FULL_TAG}" .
+docker build -t "${FULL_TAG}" laravel-app/
 echo ""
 
 # ── 5. Push the image ────────────────────────────

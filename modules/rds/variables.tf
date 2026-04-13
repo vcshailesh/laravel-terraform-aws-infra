@@ -32,6 +32,11 @@ variable "password" {
   description = "Master password for the database"
   type        = string
   sensitive   = true
+
+  validation {
+    condition     = !can(regex("[/@\" ]", var.password))
+    error_message = "Password must not contain '/', '@', '\"', or spaces (AWS RDS restriction)."
+  }
 }
 
 variable "engine_version" {
